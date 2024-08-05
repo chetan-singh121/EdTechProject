@@ -47,6 +47,7 @@ exports.showAllCategories=async(req,res)=>
 {
     try
     {
+        // console.log("show all categories ke andar");
         const allCategory = await Category.find({},{name:true,description:true});
         return res.status(200).json({
             success:true,

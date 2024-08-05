@@ -70,7 +70,7 @@ exports.createSection=async(req,res)=>
                 //return response
 
                  //data input
-                 const{sectionName,sectionId}=req.body;
+                 const{sectionName,sectionId,courseId}=req.body;
 
                 //validation
                 if(!sectionName || !sectionId)
@@ -84,12 +84,17 @@ exports.createSection=async(req,res)=>
                 //update data
                 const section = await Section.findByIdAndUpdate(sectionId,{sectionName},{new:true});
 
+                const course=await Course.findById(courseId).populate({
+                                                             path:"courseContent",
+                                                             populate:{path:"subSection"},
+                                                             }).exec();
+
                  
                 //return response
                 return res.status(200).json({
                     success:true,
                     message:'section updted successfully',
-                    section,
+                    data:course,
                 })
 
 
@@ -133,13 +138,21 @@ exports.deleteSection=async(req,res)=>
             //use findByIdAndDelete
             await Section.findByIdAndDelete(sectionId);
 
-            const course= await Course.findByIdAndUpdate(courseId,
+            await Course.findByIdAndUpdate(courseId,
                 {
                     $pull:{
                         courseContent:sectionId,
                     }
                 }
             )
+
+            const course = await Course.findById(courseId).populate({
+                path:"courseContent",
+                populate: {
+                    path: "subSection"
+                }
+            })
+            .exec();
 
             //return response
             return res.status(200).json({
@@ -165,3 +178,9 @@ exports.deleteSection=async(req,res)=>
 
         }
     }
+
+
+
+
+
+

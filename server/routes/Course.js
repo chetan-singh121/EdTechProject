@@ -96,7 +96,7 @@ router.post("/updateCourseProgress", auth, isStudent, updateCourseProgress);
 // Category can Only be Created by Admin
 
 router.post("/createCategory", auth,isAdmin, createCategory)
-router.get("/showAllCategories",auth, isAdmin, showAllCategories)
+router.get("/showAllCategories", showAllCategories)
 router.post("/getCategoryPageDetails", auth,isAdmin,CategoryPageDetails)
 
 

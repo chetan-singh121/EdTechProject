@@ -18,13 +18,13 @@ exports.createSubSection = async(req,res)=>
             //return response
 
             //fetch data form req body
-            const{sectionId,title,timeDuration, description}=req.body;
+            const{sectionId,title, description}=req.body;
 
             //extract file/video
             const video=req.files.video; //video file ka naam--- videoFile hai.
 
             //validation
-            if(!sectionId || !title ||!timeDuration ||!description ||!video)
+            if(!sectionId || !title  ||!description ||!video)
                 {
                     return res.status(400).json({
                         success:false,
@@ -38,7 +38,7 @@ exports.createSubSection = async(req,res)=>
             //create subsection 
             const SubSectionDetails= await SubSection.create({
                 title:title,
-                timeDuration:timeDuration,
+                timeDuration:`${uploadDetails.duration}`,
                 description:description,
                 videoUrl:uploadDetails.secure_url,
             })
@@ -51,14 +51,14 @@ exports.createSubSection = async(req,res)=>
                                                                         }
 
                                                                     },
-                                                                    {new:true} );
+                                                                    {new:true} ).populate("subSection");
              
              //HW: print updated section here, by populate querry                                                      
             //return response
             return res.status(200).json({
                 success:true,
                 message:'sub section created successfully',
-                updatedSection,
+                data:updatedSection,
             })
 
         }
@@ -80,7 +80,7 @@ exports.createSubSection = async(req,res)=>
         {
             try{
                 //fetch details
-                const{subSectionId,title,timeDuration, description}=req.body;
+                const{sectionId,subSectionId,title, description}=req.body;
                 const subSectionDetails=await SubSection.findById(subSectionId);
 
                 //validation
@@ -95,10 +95,7 @@ exports.createSubSection = async(req,res)=>
                     {
                         subSectionDetails.title=title;
                     }
-                if(timeDuration)
-                    {
-                        subSectionDetails.timeDuration=timeDuration;
-                    }
+               
                 if(description)
                     {
                         subSectionDetails.description=description;
@@ -110,10 +107,12 @@ exports.createSubSection = async(req,res)=>
                         subSectionDetails.videoUrl=uploadDetails.secure_url;
                     }
                 await subSectionDetails.save();
+                const updatedSection = await Section.findById(sectionId).populate("subSection");
 
                 return res.status(200).json({
                     success:true,
                     message:"subsection updation successful",
+                    data:updatedSection,
                 })
                 
 

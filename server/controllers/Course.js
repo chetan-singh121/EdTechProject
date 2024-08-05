@@ -2,6 +2,7 @@ const Course=require("../models/Course")
 // const Category=require("../models/Category")
 const User=require("../models/User")
 const {uploadImageCloudinary}=require("../utils/imageUploader");
+const { convertSecondsToDuration } = require("../utils/secToDuration")
 
 //createCourse handler funtion
 exports.createCourse=async(req,res)=>
@@ -81,6 +82,7 @@ exports.createCourse=async(req,res)=>
             const thumbnailImage=await uploadImageCloudinary(thumbnail,process.env.FOLDER_NAME);
 
             //create an entry for new course
+            console.log("course creation se pehle wali line");
             const newCourse=await Course.create({
                 courseName,
                 courseDescription,
@@ -137,7 +139,7 @@ exports.createCourse=async(req,res)=>
             return res.status(500).json({
                 success:false,
                 message:"failed in course creation",
-                error:error.message,
+                error:message.error,
              });
 
         }
@@ -182,7 +184,7 @@ exports.createCourse=async(req,res)=>
             .populate({
               path: "instructor",
               populate: {
-                path: "additionalDetails",
+                path: "additionDetails",
               },
             })
             .populate("category")
@@ -309,7 +311,7 @@ exports.getCourseDetails = async(req,res)=>
             .populate({
               path: "instructor",
               populate: {
-                path: "additionalDetails",
+                path: "additionDetails",
               },
             })
             .populate("category")
@@ -404,7 +406,7 @@ exports.getCourseDetails = async(req,res)=>
           }
       
           // Unenroll students from the course
-          const studentsEnrolled = course.studentsEnroled
+          const studentsEnrolled = course.studentsEnrolled
           for (const studentId of studentsEnrolled) {
             await User.findByIdAndUpdate(studentId, {
               $pull: { courses: courseId },
